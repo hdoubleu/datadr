@@ -99,6 +99,8 @@ mrExecInternal.kvLocalDiskList <- function(data, setup = NULL, map = NULL, reduc
   } else {
     tempDir <- control$mapred_temp_dir
   }
+  cat(sprintf(">> %s ; mapreduce_kvLocalDisk ; `tempDir` is %s\n", Sys.time(), tempDir))
+
   # put results in a "job" directory named "job_i" where i increments
   jobDirs <- list.files(tempDir, pattern = "^job_")
   jobNums <- as.integer(gsub("^job_", "", jobDirs))
@@ -113,7 +115,10 @@ mrExecInternal.kvLocalDiskList <- function(data, setup = NULL, map = NULL, reduc
   mapDir <- file.path(jobDir, "map")
   reduceDir <- file.path(jobDir, "reduce")
   countersDir <- file.path(jobDir, "counters")
+
   logDir <- file.path(jobDir, "log")
+  cat(sprintf(">> %s ; mapreduce_kvLocalDisk ; `logDir` is %s\n", Sys.time(), logDir))
+
   stopifnot(dir.create(mapDir))
   stopifnot(dir.create(reduceDir))
   stopifnot(dir.create(countersDir))
@@ -138,6 +143,8 @@ mrExecInternal.kvLocalDiskList <- function(data, setup = NULL, map = NULL, reduc
     })
   })
   mFileList <- unlist(mFileList, recursive = FALSE)
+  cat(spirntf(">> %s ; mapper ; `mFileList`\n", Sys.time()))
+  cat(mFileList)
 
   # give a map task id to each block
   for(i in seq_along(mFileList)) {
@@ -147,6 +154,8 @@ mrExecInternal.kvLocalDiskList <- function(data, setup = NULL, map = NULL, reduc
   # sapply(mFileList, function(x) sum(x$sz))
 
   mapFn <- function(fl) {
+    cat(spirntf(">> %s ; mapper ; started.\n", Sys.time()))
+
     mapEnv <- new.env() # parent = baseenv())
     curEnv <- mapEnv
     assign("mr___packages", params$mr___packages, mapEnv)
@@ -176,6 +185,9 @@ mrExecInternal.kvLocalDiskList <- function(data, setup = NULL, map = NULL, reduc
 
     # iterate through map blocks and apply map to each
     mapBlocks <- makeBlockIndices(fl$sz, control$map_buff_size_bytes, nSlots)
+    cat(sprintf(">> %s ; mapreducer_kvLocalDisk ; `mapBlocks` content:\n", Sys.time()))
+    cat(mapBlocks)
+
     for(idx in mapBlocks) {
       # set fresh params for each application of map expression
       # in case a previous map updates them
@@ -200,8 +212,10 @@ mrExecInternal.kvLocalDiskList <- function(data, setup = NULL, map = NULL, reduc
       mapEnv$counter("map", "kvProcessed", length(mapEnv$map.values))
 
       # cat(object.size(mapEnv$taskRes), "\n")
-      if(object.size(mapEnv$taskRes) > control$map_temp_buff_size_bytes)
+      if(object.size(mapEnv$taskRes) > control$map_temp_buff_size_bytes) {
+        cat(sprintf(">> %s ; mapper ; flushing\n", Sys.time()))
         mapEnv$flushKV()
+      }
     }
     mapEnv$flushKV()
   }
