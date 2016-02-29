@@ -144,7 +144,7 @@ mrExecInternal.kvLocalDiskList <- function(data, setup = NULL, map = NULL, reduc
   })
   mFileList <- unlist(mFileList, recursive = FALSE)
   cat(sprintf(">> %s ; mapper ; `mFileList`\n", Sys.time()))
-  cat(mFileList)
+  print(mFileList)
 
   # give a map task id to each block
   for(i in seq_along(mFileList)) {
@@ -186,7 +186,7 @@ mrExecInternal.kvLocalDiskList <- function(data, setup = NULL, map = NULL, reduc
     # iterate through map blocks and apply map to each
     mapBlocks <- makeBlockIndices(fl$sz, control$map_buff_size_bytes, nSlots)
     cat(sprintf(">> %s ; mapreducer_kvLocalDisk ; `mapBlocks` content:\n", Sys.time()))
-    cat(mapBlocks)
+    print(mapBlocks)
 
     for(idx in mapBlocks) {
       # set fresh params for each application of map expression
