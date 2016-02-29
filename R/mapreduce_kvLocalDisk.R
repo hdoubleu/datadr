@@ -143,7 +143,7 @@ mrExecInternal.kvLocalDiskList <- function(data, setup = NULL, map = NULL, reduc
     })
   })
   mFileList <- unlist(mFileList, recursive = FALSE)
-  cat(spirntf(">> %s ; mapper ; `mFileList`\n", Sys.time()))
+  cat(sprintf(">> %s ; mapper ; `mFileList`\n", Sys.time()))
   cat(mFileList)
 
   # give a map task id to each block
@@ -154,7 +154,7 @@ mrExecInternal.kvLocalDiskList <- function(data, setup = NULL, map = NULL, reduc
   # sapply(mFileList, function(x) sum(x$sz))
 
   mapFn <- function(fl) {
-    cat(spirntf(">> %s ; mapper ; started.\n", Sys.time()))
+    cat(sprintf(">> %s ; mapper ; started.\n", Sys.time()))
 
     mapEnv <- new.env() # parent = baseenv())
     curEnv <- mapEnv
