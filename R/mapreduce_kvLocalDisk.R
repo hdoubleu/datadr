@@ -143,7 +143,7 @@ mrExecInternal.kvLocalDiskList <- function(data, setup = NULL, map = NULL, reduc
     })
   })
   mFileList <- unlist(mFileList, recursive = FALSE)
-  cat(sprintf(">> %s ; mapper ; `mFileList`\n", Sys.time()))
+  cat(sprintf(">> %s ; mapreduce_kvLocalDisk ; `mFileList`\n", Sys.time()))
   print(mFileList)
 
   # give a map task id to each block
@@ -154,7 +154,8 @@ mrExecInternal.kvLocalDiskList <- function(data, setup = NULL, map = NULL, reduc
   # sapply(mFileList, function(x) sum(x$sz))
 
   mapFn <- function(fl) {
-    cat(sprintf(">> %s ; mapper ; started.\n", Sys.time()))
+    mapper_id <- sample(1:1000, 1)
+    cat(sprintf(">> %s ; mapper %i ; started.\n", Sys.time(), mapper_id))
 
     mapEnv <- new.env() # parent = baseenv())
     curEnv <- mapEnv
@@ -185,7 +186,7 @@ mrExecInternal.kvLocalDiskList <- function(data, setup = NULL, map = NULL, reduc
 
     # iterate through map blocks and apply map to each
     mapBlocks <- makeBlockIndices(fl$sz, control$map_buff_size_bytes, nSlots)
-    cat(sprintf(">> %s ; mapreducer_kvLocalDisk ; `mapBlocks` content:\n", Sys.time()))
+    cat(sprintf(">> %s ; mapper %i ; `mapBlocks` content:\n", Sys.time(), mapper_id))
     print(mapBlocks)
 
     for(idx in mapBlocks) {
@@ -213,7 +214,7 @@ mrExecInternal.kvLocalDiskList <- function(data, setup = NULL, map = NULL, reduc
 
       # cat(object.size(mapEnv$taskRes), "\n")
       if(object.size(mapEnv$taskRes) > control$map_temp_buff_size_bytes) {
-        cat(sprintf(">> %s ; mapper ; flushing\n", Sys.time()))
+        cat(sprintf(">> %s ; mapper %i ; flushing\n", Sys.time(), mapper_id))
         mapEnv$flushKV()
       }
     }
@@ -222,8 +223,10 @@ mrExecInternal.kvLocalDiskList <- function(data, setup = NULL, map = NULL, reduc
 
   ### run map tasks
   if(!is.null(control$cluster)) {
+    cat(sprintf(">> %s ; mapreduce_kvLocalDisk ; Exporting tasks to cluseter", Sys.time()))
     clusterExport(control$cluster, c("map", "reduce", "setup", "params", "mapDir", "reduceDir", "countersDir", "makeBlockIndices", "nSlots", "control", "LDflushKV", "LDcounter", "LDcollect", "params"), envir = environment())
 
+    cat(sprintf(">> %s ; mapreduce_kvLocalDisk ; Starting tasks", Sys.time()))
     parLapply(control$cluster, mFileList, mapFn)
   } else {
     lapply(mFileList, mapFn)
