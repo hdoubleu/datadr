@@ -12,3 +12,5 @@ protobuf_install/
 ^_ignore$
 \.sublime\-
 rhipe-java.log
+^.*\.Rproj$
+^\.Rproj\.user$
