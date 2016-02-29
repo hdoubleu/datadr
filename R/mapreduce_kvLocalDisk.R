@@ -214,19 +214,20 @@ mrExecInternal.kvLocalDiskList <- function(data, setup = NULL, map = NULL, reduc
 
       # cat(object.size(mapEnv$taskRes), "\n")
       if(object.size(mapEnv$taskRes) > control$map_temp_buff_size_bytes) {
-        cat(sprintf(">> %s ; mapper %i ; flushing\n", Sys.time(), mapper_id))
+        cat(sprintf(">> %s ; mapper %i ; buffer reached...flushing\n", Sys.time(), mapper_id))
         mapEnv$flushKV()
       }
     }
+    cat(sprintf(">> %s ; mapper %i ; completed operation\n", Sys.time(), mapper_id))
     mapEnv$flushKV()
   }
 
   ### run map tasks
   if(!is.null(control$cluster)) {
-    cat(sprintf(">> %s ; mapreduce_kvLocalDisk ; Exporting tasks to cluseter", Sys.time()))
+    cat(sprintf(">> %s ; mapreduce_kvLocalDisk ; Exporting tasks to clusters...\n", Sys.time()))
     clusterExport(control$cluster, c("map", "reduce", "setup", "params", "mapDir", "reduceDir", "countersDir", "makeBlockIndices", "nSlots", "control", "LDflushKV", "LDcounter", "LDcollect", "params"), envir = environment())
 
-    cat(sprintf(">> %s ; mapreduce_kvLocalDisk ; Starting tasks", Sys.time()))
+    cat(sprintf(">> %s ; mapreduce_kvLocalDisk ; Starting mappers...\n", Sys.time()))
     parLapply(control$cluster, mFileList, mapFn)
   } else {
     lapply(mFileList, mapFn)
@@ -270,7 +271,10 @@ mrExecInternal.kvLocalDiskList <- function(data, setup = NULL, map = NULL, reduc
         assign(pnames[i], params[[i]], envir = reduceEnv)
       }
     }
-    eval(setup, envir = reduceEnv)
+    eval(setup, envir = reduceEnv)i
+
+    reducer_id <- sample(1:1000, 1)
+    cat(sprintf(">> %s ; reducer %i ; started.\n", Sys.time(), reducer_id))
 
     # add collect, counter functions to the environment
     environment(LDcollect) <- reduceEnv
@@ -308,12 +312,15 @@ mrExecInternal.kvLocalDiskList <- function(data, setup = NULL, map = NULL, reduc
       eval(reduce$post, envir = reduceEnv)
       # count number of k/v processed
       reduceEnv$counter("reduce", "kvProcessed", 1)
+
+      cat(sprintf(">> %s ; reducer %i ; operation completed\n", Sys.time(), reducer_id))
       reduceEnv$flushKV()
     }
   }
 
   ### run reduce tasks
   if(!is.null(control$cluster)) {
+    cat(sprintf(">> %s ; mapreduce_kvLocalDisk ; Starting reducers...\n", Sys.time()))
     parLapply(control$cluster, rFileList, reduceFn)
   } else {
     lapply(rFileList, reduceFn)
