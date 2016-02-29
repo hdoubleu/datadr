@@ -271,7 +271,7 @@ mrExecInternal.kvLocalDiskList <- function(data, setup = NULL, map = NULL, reduc
         assign(pnames[i], params[[i]], envir = reduceEnv)
       }
     }
-    eval(setup, envir = reduceEnv)i
+    eval(setup, envir = reduceEnv)
 
     reducer_id <- sample(1:1000, 1)
     cat(sprintf(">> %s ; reducer %i ; started.\n", Sys.time(), reducer_id))
