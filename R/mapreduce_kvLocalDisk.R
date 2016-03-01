@@ -143,8 +143,8 @@ mrExecInternal.kvLocalDiskList <- function(data, setup = NULL, map = NULL, reduc
     })
   })
   mFileList <- unlist(mFileList, recursive = FALSE)
-  cat(sprintf(">> %s ; mapreduce_kvLocalDisk ; `mFileList`\n", Sys.time()))
-  print(mFileList)
+  cat(sprintf(">> %s ; mapreduce_kvLocalDisk ; %i of `mFileList`\n",
+              Sys.time(), length(mFileList)))
 
   # give a map task id to each block
   for(i in seq_along(mFileList)) {
@@ -186,8 +186,8 @@ mrExecInternal.kvLocalDiskList <- function(data, setup = NULL, map = NULL, reduc
 
     # iterate through map blocks and apply map to each
     mapBlocks <- makeBlockIndices(fl$sz, control$map_buff_size_bytes, nSlots)
-    cat(sprintf(">> %s ; mapper %i ; `mapBlocks` content:\n", Sys.time(), mapper_id))
-    print(mapBlocks)
+    cat(sprintf(">> %s ; mapper %i ; %i of `mapBlocks` to apply mappers to\n",
+                Sys.time(), mapper_id, length(mapBlocks)))
 
     for(idx in mapBlocks) {
       # set fresh params for each application of map expression
@@ -197,6 +197,8 @@ mrExecInternal.kvLocalDiskList <- function(data, setup = NULL, map = NULL, reduc
         assign(pnames[i], params[[i]], envir = mapEnv)
 
       curDat <- lapply(fl$ff[idx], function(x) {
+        cat(sprintf(">> %s ; mapper %i ; Loading %s file\n",
+                    Sys.time(), mapper_id, file.path(fl$fp, x)))
         load(file.path(fl$fp, x))
         obj[[1]]
       })
@@ -290,6 +292,9 @@ mrExecInternal.kvLocalDiskList <- function(data, setup = NULL, map = NULL, reduc
     assign("taskDir", reduceDir, reduceEnv)
     assign("writeKVseparately", FALSE, reduceEnv) # more efficient
 
+    cat(sprintf(">> %s ; reducer %i ; %i of `reduceTaskFiles$rf`\n",
+                Sys.time(), reducer_id, length(reduceTaskFiles$rf)))
+
     for(curReduceFiles in reduceTaskFiles$rf) {
       assign("taskRes", list(), reduceEnv)
       assign("taskCounter", list(), reduceEnv)
@@ -300,6 +305,9 @@ mrExecInternal.kvLocalDiskList <- function(data, setup = NULL, map = NULL, reduc
       # nSlots is 1 because we are already in parLapply
       reduceBlocks <- makeBlockIndices(curReduceFiles$sz, control$reduce_buff_size_bytes, nSlots = 1)
       eval(reduce$pre, envir = reduceEnv)
+
+      cat(sprintf(">> %s ; reducer %i ; %i of `reduceBlocks`\n",
+                  Sys.time(), reducer_id, length(reduceBlocks)))
 
       for(idx in reduceBlocks) {
         curDat <- do.call(c, lapply(curReduceFiles$ff[idx], function(x) {
@@ -313,9 +321,10 @@ mrExecInternal.kvLocalDiskList <- function(data, setup = NULL, map = NULL, reduc
       # count number of k/v processed
       reduceEnv$counter("reduce", "kvProcessed", 1)
 
-      cat(sprintf(">> %s ; reducer %i ; operation completed\n", Sys.time(), reducer_id))
+      cat(sprintf(">> %s ; reducer %i ; operation completed on data block. flushing...\n", Sys.time(), reducer_id))
       reduceEnv$flushKV()
     }
+    cat(sprintf(">> %s ; reducer %i ; Reducer ended.\n", Sys.time(), reducer_id))
   }
 
   ### run reduce tasks
