@@ -77,6 +77,7 @@ drM <- function(..., type = c("lm", "glm")) {
   res <- list(
     names = names(stats::coef(fit)),
     coef = as.numeric(stats::coef(fit)),
+    serr = as.numeric(coef(summary(fit))[,"Std. Error"]),
     n = nrow(args$data)
   )
   class(res) <- c("drCoef", "list")
