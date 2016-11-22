@@ -8,7 +8,7 @@ readHDFStextFile(input, output = NULL, overwrite = FALSE, fn = NULL,
   keyFn = NULL, linesPerBlock = 10000, control = NULL, update = FALSE)
 }
 \arguments{
-\item{input}{a RHIPE input text handle created with \code{rhfmt}}
+\item{input}{a ddo / ddf connection to a text input directory on HDFS, created with \code{\link{hdfsConn}} - ensure the text files are within a directory and that type = "text" is specified}
 
 \item{output}{an output connection such as those created with \code{\link{localDiskConn}}, and \code{\link{hdfsConn}}}
 
@@ -26,5 +26,16 @@ readHDFStextFile(input, output = NULL, overwrite = FALSE, fn = NULL,
 }
 \description{
 Experimental helper function for reading text data on HDFS into a HDFS connection
+}
+\examples{
+\dontrun{
+res <- readHDFStextFile(
+  input = Rhipe::rhfmt("/path/to/input/text", type = "text"),
+  output = hdfsConn("/path/to/output"),
+  fn = function(x) {
+    read.csv(textConnection(paste(x, collapse = "\\n")), header = FALSE)
+  }
+)
+}
 }
 

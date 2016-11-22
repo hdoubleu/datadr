@@ -44,6 +44,8 @@ kvPair <- function(k, v)
 #'
 #' @param x object to be printed
 #' @param \ldots additional arguments
+#' @examples
+#'  kvPair(1, letters)
 #' @export
 #' @method print kvPair
 print.kvPair <- function(x, ...) {
@@ -57,17 +59,19 @@ print.kvPair <- function(x, ...) {
 #'
 #' @param x object to be printed
 #' @param \ldots additional arguments
+#' @examples
+#'  kvPair(1, letters)
 #' @export
 #' @method print kvValue
 print.kvValue <- function(x, ...) {
   attr(x, "split") <- NULL
   class(x) <- setdiff(class(x), "kvValue")
   if(inherits(x, "data.frame")) {
-    tmp <- head(x, 5)
+    tmp <- utils::head(x, 5)
     more <- NULL
     if(nrow(x) > 5)
       more <- "...\n"
-    cat(paste(c(capture.output(tmp), more), sep = "", collapse = "\n"))
+    cat(paste(c(utils::capture.output(tmp), more), sep = "", collapse = "\n"))
   } else {
     print(x)
   }

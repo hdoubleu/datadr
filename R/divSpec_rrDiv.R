@@ -11,12 +11,18 @@
 #'
 #' @references
 #' \itemize{
-#'  \item \url{http://tessera.io}
+#'  \item \url{http://deltarho.org}
 #'  \item \href{http://onlinelibrary.wiley.com/doi/10.1002/sta4.7/full}{Guha, S., Hafen, R., Rounds, J., Xia, J., Li, J., Xi, B., & Cleveland, W. S. (2012). Large complex data: divide and recombine (D&R) with RHIPE. \emph{Stat}, 1(1), 53-67.}
 #' }
 #'
 #' @author Ryan Hafen
 #' @seealso \code{\link{divide}}, \code{\link{recombine}}, \code{\link{condDiv}}
+#' @examples
+#' # divide iris data into random subsets with ~20 records per subset
+#' irisRR <- divide(iris, by = rrDiv(20), update = TRUE)
+#' irisRR
+#' # look at the actual distribution of number of rows per subset
+#' plot(splitRowDistn(irisRR))
 #' @export
 rrDiv <- function(nrows = NULL, seed = NULL) {
   res <- list(type = "rrDiv", nrows = nrows, seed = seed)
@@ -33,7 +39,8 @@ getCuts.rrDiv <- function(by, curDF) {
 
   if(!is.null(by$seed)) set.seed(by$seed)
   # cuts <- paste("rr_", sample(1:ndiv, n, replace = TRUE), sep = "")
-  paste("rr_", cut(runif(n), seq(0, 1, length = ndiv + 1), labels = FALSE), sep = "")
+  paste("rr_", cut(stats::runif(n),
+    seq(0, 1, length = ndiv + 1), labels = FALSE), sep = "")
 }
 
 #' @export

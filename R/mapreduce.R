@@ -30,6 +30,34 @@
 #' @return "ddo" object - to keep it simple.  It is up to the user to update or cast as "ddf" if that is the desired result.
 #'
 #' @author Ryan Hafen
+#' @examples
+#' # compute min and max Sepal Length by species for iris data
+#' # using a random partitioning of it as input
+#' d <- divide(iris, by = rrDiv(20))
+#'
+#' mapExp <- expression({
+#'   lapply(map.values, function(r) {
+#'     by(r, r$Species, function(x) {
+#'       collect(
+#'         as.character(x$Species[1]),
+#'         range(x$Sepal.Length, na.rm = TRUE)
+#'       )
+#'     })
+#'   })
+#' })
+#'
+#' reduceExp <- expression(
+#'   pre = {
+#'     rng <- c(Inf, -Inf)
+#'   }, reduce = {
+#'     rx <- unlist(reduce.values)
+#'     rng <- c(min(rng[1], rx, na.rm = TRUE), max(rng[2], rx, na.rm = TRUE))
+#'   }, post = {
+#'     collect(reduce.key, rng)
+#' })
+#'
+#' res <- mrExec(d, map = mapExp, reduce = reduceExp)
+#' as.list(res)
 #'
 #' @export
 mrExec <- function(data, setup = NULL, map = NULL, reduce = NULL, output = NULL, overwrite = FALSE, control = NULL, params = NULL, packages = NULL, verbose = TRUE) {
@@ -49,7 +77,7 @@ mrExec <- function(data, setup = NULL, map = NULL, reduce = NULL, output = NULL,
   } else {
     data <- list(data)
   }
-  class(data) <- c(paste(tail(class(data[[1]]), 1), "List", sep = ""), "list")
+  class(data) <- c(paste(utils::tail(class(data[[1]]), 1), "List", sep = ""), "list")
 
   # assign names to each data source if missing
   nms <- names(data)
@@ -65,7 +93,7 @@ mrExec <- function(data, setup = NULL, map = NULL, reduce = NULL, output = NULL,
   names(data) <- nms
 
   if(is.character(output)) {
-    class(output) <- c("character", paste0(tail(class(data[[1]]), 1), "Char"))
+    class(output) <- c("character", paste0(utils::tail(class(data[[1]]), 1), "Char"))
     output <- charToOutput(output)
   }
 

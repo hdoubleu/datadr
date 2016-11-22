@@ -2,9 +2,12 @@
 % Please edit documentation in R/divide.R
 \name{getSplitVar}
 \alias{getSplitVar}
-\title{Extract "Split" Variable}
+\alias{getSplitVars}
+\title{Extract "Split" Variable(s)}
 \usage{
 getSplitVar(x, name)
+
+getSplitVars(x)
 }
 \arguments{
 \item{x}{a key-value pair or a value}
@@ -13,5 +16,12 @@ getSplitVar(x, name)
 }
 \description{
 For a given key-value pair or value, get a split variable value by name, if present (split variables are variables that define how the data was divided).
+}
+\examples{
+d <- divide(iris, by = "Species",
+  bsvFn = function(x)
+    list(msl = bsv(mean(x$Sepal.Length))))
+getSplitVars(d[[1]]$value)
+getSplitVar(d[[1]]$value, "Species")
 }
 

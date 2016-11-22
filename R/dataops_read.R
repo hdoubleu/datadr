@@ -56,8 +56,8 @@ readTextFileByChunk <- function(input, output, overwrite = FALSE, linesPerBlock 
 
     if(!is.null(recordEndRegex)) {
       cutoff <- max(which(grepl(recordEndRegex, data)))
-      extra <- tail(data, length(data) - cutoff)
-      data <- head(data, cutoff)
+      extra <- utils::tail(data, length(data) - cutoff)
+      data <- utils::head(data, cutoff)
     } else {
       extra <- NULL
     }
@@ -90,7 +90,7 @@ readTextFileByChunk <- function(input, output, overwrite = FALSE, linesPerBlock 
 #' Experimental HDFS text reader helper function
 #'
 #' Experimental helper function for reading text data on HDFS into a HDFS connection
-#' @param input a RHIPE input text handle created with \code{rhfmt}
+#' @param input a ddo / ddf connection to a text input directory on HDFS, created with \code{\link{hdfsConn}} - ensure the text files are within a directory and that type = "text" is specified
 #' @param output an output connection such as those created with \code{\link{localDiskConn}}, and \code{\link{hdfsConn}}
 #' @param overwrite logical; should existing output location be overwritten? (also can specify \code{overwrite = "backup"} to move the existing output to _bak)
 #' @param fn function to be applied to each chunk of lines (input to function is a vector of strings)
@@ -98,6 +98,16 @@ readTextFileByChunk <- function(input, output, overwrite = FALSE, linesPerBlock 
 #' @param linesPerBlock how many lines at a time to read
 #' @param control parameters specifying how the backend should handle things (most-likely parameters to \code{rhwatch} in RHIPE) - see \code{\link{rhipeControl}} and \code{\link{localDiskControl}}
 #' @param update should a MapReduce job be run to obtain additional attributes for the result data prior to returning?
+#' @examples
+#' \dontrun{
+#' res <- readHDFStextFile(
+#'   input = Rhipe::rhfmt("/path/to/input/text", type = "text"),
+#'   output = hdfsConn("/path/to/output"),
+#'   fn = function(x) {
+#'     read.csv(textConnection(paste(x, collapse = "\n")), header = FALSE)
+#'   }
+#' )
+#' }
 #' @export
 readHDFStextFile <- function(input, output = NULL, overwrite = FALSE, fn = NULL, keyFn = NULL, linesPerBlock = 10000, control = NULL, update = FALSE) {
   if(!inherits(input, "kvHDFS"))
@@ -133,7 +143,6 @@ readHDFStextFile <- function(input, output = NULL, overwrite = FALSE, fn = NULL,
   suppressMessages(output <- output)
 
   mrExec(input,
-    setup    = setup,
     map     = map,
     reduce   = reduce,
     output   = output,

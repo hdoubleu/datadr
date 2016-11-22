@@ -71,16 +71,35 @@ hasExtractableKV.kvHDFS <- function(x) {
 
 #' Take a ddo/ddf HDFS data object and turn it into a mapfile
 #' @param obj object of class 'ddo' or 'ddf' with an HDFS connection
+#' @param control parameters specifying how the backend should handle things (most-likely parameters to \code{rhwatch} in RHIPE) - see \code{\link{rhipeControl}} and \code{\link{localDiskControl}}
+#' @examples
+#' \dontrun{
+#'   conn <- hdfsConn("/test/irisSplit")
+#'   # add some data
+#'   addData(conn, list(list("1", iris[1:10,])))
+#'   addData(conn, list(list("2", iris[11:110,])))
+#'   addData(conn, list(list("3", iris[111:150,])))
+#'   # represent it as a distributed data frame
+#'   hdd <- ddf(conn)
+#'   # try to extract values by key (this will result in an error)
+#'   # (HDFS can only lookup key-value pairs by key if data is in a mapfile)
+#'   hdd[["3"]]
+#'   # convert hdd into a mapfile
+#'   hdd <- makeExtractable(hdd)
+#'   # try again
+#'   hdd[["3"]]
+#' }
 #' @export
-makeExtractable <- function(obj) {
+makeExtractable <- function(obj, control = NULL) {
   if(!inherits(obj, "kvHDFS"))
     stop("object must have an HDFS connection")
 
-  mkd <- getFromNamespace("mkdHDFSTempFolder", "Rhipe")
+  mkd <- utils::getFromNamespace("mkdHDFSTempFolder", "Rhipe")
 
   # identity mr job
   res <- mrExec(
     obj,
+    control = control,
     output = hdfsConn(mkd(file = "tmp_output"), type = "map", autoYes = TRUE, verbose = FALSE)
   )
 

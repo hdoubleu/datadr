@@ -23,7 +23,7 @@ combineMultipleMoments(...)
 moments2statistics(m)
 }
 \arguments{
-\item{formula}{a formula to be used in \code{\link{xtabs}}}
+\item{formula}{a formula to be used in \code{\link[stats]{xtabs}}}
 
 \item{data}{a subset of a 'ddf' object}
 
@@ -41,5 +41,9 @@ moments2statistics(m)
 }
 \description{
 Functions that are used to tabulate categorical variables and compute moments for numeric variables inside through the MapReduce framework.  Used in \code{\link{updateAttributes}}.
+}
+\examples{
+d <- divide(iris, by = "Species", update = TRUE)
+summary(d)
 }
 

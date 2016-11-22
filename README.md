@@ -1,29 +1,28 @@
 # datadr: Divide and Recombine in R
 
-[![Build Status](https://travis-ci.org/tesseradata/datadr.svg?branch=master)](https://travis-ci.org/tesseradata/datadr)
+[![Join the chat at https://gitter.im/delta-rho/users](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/delta-rho/users?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build Status](https://travis-ci.org/delta-rho/datadr.svg?branch=master)](https://travis-ci.org/delta-rho/datadr)
+[![CRAN](http://www.r-pkg.org/badges/version/datadr)](https://cran.r-project.org/package=datadr)
 
-datadr is an R package that leverages [RHIPE](https://github.com/tesseradata/RHIPE) to provide a simple interface to division and recombination (D&R) methods for large complex data.
+datadr is an R package that leverages [RHIPE](https://github.com/delta-rho/RHIPE) to provide a simple interface to division and recombination (D&R) methods for large complex data.
 
-To get started, see the package documentation and function reference located [here](http://tesseradata.github.com/datadr). 
+To get started, see the package documentation and function reference located [here](http://deltarho.org/datadr).
 
-Visualization tools based on D&R can be found [here](https://github.com/tesseradata/trelliscope).
+Visualization tools based on D&R can be found [here](https://github.com/delta-rho/trelliscope).
 
 ## Installation
 
-```s
-options(repos = c(tessera = "http://packages.tessera.io", getOption("repos")))
+```r
+# from CRAN:
 install.packages("datadr")
-```
 
-Alternatively, you can install directly from github:
-
-```s
-devtools::install_github("tesseradata/datadr")
+# from github:
+devtools::install_github("delta-rho/datadr")
 ```
 
 ## License
 
-This software is currently under the BSD license.  Please read the [license](https://github.com/tesseradata/datadr/blob/master/LICENSE.md) document.
+This software is currently under the BSD license.  Please read the [license](https://github.com/delta-rho/datadr/blob/master/LICENSE.md) document.
 
 ## Acknowledgement
 
