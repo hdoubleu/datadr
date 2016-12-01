@@ -133,13 +133,13 @@ combMeanCoefNStdErr <- function(...) {
           comb_stderr <- sqrt( (1 / num_subsets^2) * sum(std_errs^2))
         },
         post = {
-          comb_coef <- comb_coef / n
+          comb_coef <- res / n
           names(comb_coef) <- coefNames
 
-          res$coef <- comb_coef
-          res$stderr <- comb_stderr
+          result$coef <- comb_coef
+          result$stderr <- comb_stderr
 
-          collect("final", res)
+          collect("final", result)
         }
       ),
       final = function(x, ...) x[[1]][[2]],
