@@ -123,15 +123,19 @@ combMeanCoefNStdErr <- function(...) {
           if (is.null(coefNames))
             coefNames <- reduce.values[[1]]$names
 
-          n <- sum(c(n, unlist(lapply(reduce.values, function(x) x$n))), na.rm = TRUE)
+          n <- sum(c(n, unlist(
+            lapply(reduce.values, function(x) x$n))), na.rm = TRUE)
           res <- do.call(rbind, c(res, lapply(reduce.values, function(x) {
             x$coef * x$n
           })))
           res <- apply(res, 2, sum)
 
+          subset_std_err_sqred <- unlist(lapply(reduce.values, function(x) {
+            return((x$serr)^2)
+          }))
+          sum_subset_std_err_sqred <- sum(subset_std_err_sqred)
           num_subsets <- length(reduce.values[[1]]$n)
-          std_errs <- reduce.values[[1]]$serr
-          comb_stderr <- sqrt( (1 / num_subsets^2) * sum(std_errs^2))
+          comb_stderr <- sqrt( (1 / num_subsets^2) * sum(sum_subset_std_err_sqred^2))
         },
         post = {
           comb_coef <- res / n
