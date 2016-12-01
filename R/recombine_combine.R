@@ -86,6 +86,71 @@ combMeanCoef <- function(...) {
   class = "combMeanCoef")
 }
 
+# TODO:  the combMeanCoefNStdErr needs tests
+#' Mean Coefficient Recombination and Standard Errors
+#'
+#' Mean coefficient recombination -- Calculate the weighted average of
+#' parameter estimates for a model fit to each subset
+#'
+#' @param \ldots additional attributes to define the combiner (currently only used internally)
+#'
+# @usage recombine(distributedDataObject, combine = combMeanCoefNStdErr, ...)
+#'
+#' @details \code{combMeanCoefNStdErr} is passed to the argument \code{combine} in \code{\link{recombine}}
+#'
+#' This method recombines the means exactly like \code{\link{combMeanCoef}}.
+#' However, in additional to returning the recombined means of the
+#' co-efficients, this function also returns the recombined Standard Errors.
+#' As such, this function returns a list rather than a single value.
+#'
+#' @author Hon Hwang
+#'
+#' @seealso \code{\link{divide}}, \code{\link{recombine}}, \code{\link{rrDiv}}, \code{\link{combCollect}}, \code{\link{combDdo}}, \code{\link{combDdf}}, \code{\link{combRbind}}, \code{\link{combMean}}
+#'
+#' @export
+combMeanCoefNStdErr <- function(...) {
+  structure(
+    list(
+      reduce = expression(
+        pre = {
+          res <- list()
+          n <- as.numeric(0)
+          coefNames <- NULL
+          comb_stderr <- NULL
+        },
+        reduce = {
+          if (is.null(coefNames))
+            coefNames <- reduce.values[[1]]$names
+
+          n <- sum(c(n, unlist(lapply(reduce.values, function(x) x$n))), na.rm = TRUE)
+          res <- do.call(rbind, c(res, lapply(reduce.values, function(x) {
+            x$coef * x$n
+          })))
+          res <- apply(res, 2, sum)
+
+          num_subsets <- length(reduce.values[[1]]$n)
+          std_errs <- reduce.values[[1]]$serr
+          comb_stderr <- sqrt( (1 / num_subsets^2) * sum(std_errs^2))
+        },
+        post = {
+          comb_coef <- res / n
+          names(comb_coef) <- coefNames
+
+          res$coef <- comb_coef
+          res$stderr <- comb_stderr
+
+          collect("final", res)
+        }
+      ),
+      final = function(x, ...) x[[1]][[2]],
+      validateOutput = c("nullConn"),
+      group = TRUE,
+      ...
+    ),
+    class = "combMeanCoefNStdErr")
+} # End `combMeanCoefNStdErr()`
+
+
 # TODO:  The combMean method needs tests
 #' Mean Recombination
 #'
