@@ -117,6 +117,7 @@ combMeanCoefNStdErr <- function(...) {
           n <- as.numeric(0)
           coefNames <- NULL
           comb_stderr <- NULL
+          result <- list()
         },
         reduce = {
           if (is.null(coefNames))
