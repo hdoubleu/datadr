@@ -116,13 +116,12 @@ combMeanCoefNStdErr <- function(...) {
           res <- list()
           n <- as.numeric(0)
           coefNames <- NULL
-          comb_stderr <- NULL
+          subset_stderr <- NULL
           result <- list()
         },
         reduce = {
           if (is.null(coefNames))
-            coefNames <- reduce.values[[1]]$names
-
+            coefNames <- reduce.values[[1]]$name
           n <- sum(c(n, unlist(
             lapply(reduce.values, function(x) x$n))), na.rm = TRUE)
           res <- do.call(rbind, c(res, lapply(reduce.values, function(x) {
@@ -130,19 +129,21 @@ combMeanCoefNStdErr <- function(...) {
           })))
           res <- apply(res, 2, sum)
 
-          subset_std_err_sqred <- unlist(lapply(reduce.values, function(x) {
-            return((x$serr)^2)
-          }))
-          sum_subset_std_err_sqred <- sum(subset_std_err_sqred)
-          num_subsets <- length(reduce.values[[1]]$n)
-          comb_stderr <- sqrt( (1 / num_subsets^2) * sum(sum_subset_std_err_sqred^2))
+          # Accumulates the Standard Errors like we did for the coefficients.
+          subset_stderr <- do.call(rbind, c(subset_stderr,
+                                            lapply(reduce.values, function(x) {
+                                              return(x$serr ^ 2)
+                                            })))
         },
         post = {
           comb_coef <- res / n
           names(comb_coef) <- coefNames
 
+          subset_se_sqr_sums <- apply(subset_stderr, 2, sum)
+          comb_se <- sqrt( (1/(n^2)) * subset_se_sqr_sums)
+
           result$coef <- comb_coef
-          result$stderr <- comb_stderr
+          result$stderr <- comb_se
 
           collect("final", result)
         }
