@@ -116,7 +116,7 @@ combMeanCoefNStdErr <- function(...) {
           res <- list()
           n <- as.numeric(0)
           coefNames <- NULL
-          subset_stderr <- NULL
+          subset_stderr <- list()
           result <- list()
         },
         reduce = {
@@ -131,9 +131,7 @@ combMeanCoefNStdErr <- function(...) {
 
           # Accumulates the Standard Errors like we did for the coefficients.
           subset_stderr <- do.call(rbind, c(subset_stderr,
-            lapply(reduce.values, function(x) {
-              return(x$serr ^ 2)
-            })))
+            lapply(reduce.values, function(x) { return(x$serr ^ 2) })))
         },
         post = {
           comb_coef <- res / n
