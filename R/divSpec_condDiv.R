@@ -16,6 +16,10 @@
 #'
 #' @author Ryan Hafen
 #' @seealso \code{\link{divide}}, \code{\link{getSplitVars}}, \code{\link{getSplitVar}}
+#' @examples
+#' d <- divide(iris, by = "Species")
+#' # equivalent:
+#' d <- divide(iris, by = condDiv("Species"))
 #' @export
 condDiv <- function(vars) {
   # TODO: shingles, etc.
@@ -31,9 +35,12 @@ getCuts.condDiv <- function(by, curDF) {
 
 #' Get names of the conditioning variable cuts
 #'
-#' Used internally for exported for certain reasons.  Do not use explicitly.
+#' This is used internally for conditioning variable division.  It does not have much use outside of there, but is exported for convenience.
 #' @param df a data frame
 #' @param splitVars a vector of variable names to split by
+#' @examples
+#' # see how key names are obtained
+#' getCondCuts(iris, "Species")
 #' @export
 getCondCuts <- function(df, splitVars) {
   apply(do.call(cbind, lapply(df[,splitVars,drop = FALSE],
@@ -44,7 +51,7 @@ getCondCuts <- function(df, splitVars) {
 #' @export
 validateDivSpec.condDiv <- function(by, data, ex) {
   if(by$type == "condDiv") {
-    if(!all(by$vars %in% names(ex[[2]]))) {
+    if(!all(by$vars %in% names(flatten(ex[[2]])))) {
       stop("'by' variables for conditioning division are not matched in data.  Look at a subset of the data, e.g. 'data[[1]]' to see what to expect.")
     }
   }

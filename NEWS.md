@@ -3,6 +3,8 @@ Version 0.8
 
 FEATURES / CHANGES
 
+- Add several new documentation examples (0.8.4)
+- Update `removeData()` method for local disk connections (0.8.4)
 - Remove Spark back-end files (0.8.3)
 - Updates to get CRAN-ready (0.8.3)
 - Provide information about the key when an error occurs when applying a transformation (0.8.1)
@@ -12,6 +14,7 @@ FEATURES / CHANGES
 
 FIXES
 
+- Update unit test thresholds to be upheld on systems without long double (0.8.5)
 - Fig bug in variable preservation for multiple successive divides (0.8.3)
 - Fix bug in printing summaries for in-memory ddfs with variables with 10k+ unique levels (0.8.2)
 - Add workaround for current RHIPE bug with `combRbind()` (0.8.0)

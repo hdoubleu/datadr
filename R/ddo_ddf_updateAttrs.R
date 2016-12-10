@@ -14,10 +14,17 @@
 #' @references Bennett, Janine, et al. "Numerically stable, single-pass, parallel statistics algorithms.' Cluster Computing and Workshops", 2009. \emph{CLUSTER09. IEEE International Conference on.} IEEE, 2009
 #'
 #' @seealso \code{\link{ddo}}, \code{\link{ddf}}, \code{\link{divide}}
-#'
+#' @examples
+#' d <- divide(iris, by = "Species")
+#' # some attributes are missing:
+#' d
+#' summary(d)
+#' d <- updateAttributes(d)
+#' # now all attributes are available:
+#' d
+#' summary(d)
 #' @export
 updateAttributes <- function(obj, control = NULL) {
-  # obj <- ddf(iris)
 
   if(inherits(obj, "transformed")) {
     stop("Cannot run updateAttributes() on a transformed divided data object.", call. = FALSE)
@@ -48,7 +55,7 @@ updateAttributes <- function(obj, control = NULL) {
         r <- map.values[[i]]
 
         ### ddo
-        objSize <- as.numeric(object.size(r))
+        objSize <- as.numeric(utils::object.size(r))
         if(needs["splitSizeDistn"]) collect("splitSizeDistn", objSize)
         if(needs["totObjectSize"]) collect("totObjectSize", objSize)
         if(needs["keys"]) collect("keys", k)
@@ -179,7 +186,8 @@ updateAttributes <- function(obj, control = NULL) {
         ### ddo
         if(reduce.key == "splitSizeDistn")
           collect("splitSizeDistn",
-            quantile(splitSizeDistn, probs = seq(0, 1, by = 0.01), na.rm = TRUE))
+            stats::quantile(splitSizeDistn,
+              probs = seq(0, 1, by = 0.01), na.rm = TRUE))
         if(reduce.key == "totObjectSize")
           collect("totObjectSize", totObjectSize)
         if(reduce.key == "keys")
@@ -190,7 +198,8 @@ updateAttributes <- function(obj, control = NULL) {
         ### ddf
         if(reduce.key == "splitRowDistn")
           collect("splitRowDistn",
-            quantile(splitRowDistn, probs = seq(0, 1, by = 0.01), na.rm = TRUE))
+            stats::quantile(splitRowDistn,
+              probs = seq(0, 1, by = 0.01), na.rm = TRUE))
         if(reduce.key == "nRow")
           collect("nRow", nRow)
 

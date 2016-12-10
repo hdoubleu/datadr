@@ -141,7 +141,7 @@ drRead.table <- function(file,
   # to ensure each subset has the same column classes,
   # set them (if not already set) based on tmp read-in
   if(is.null(readTabParams$colClasses))
-    readTabParams$colClasses <- sapply(res, class)
+    readTabParams$colClasses <- unname(sapply(res, class))
   if(!autoColClasses)
     readTabParams$colClasses <- NULL
 
@@ -182,13 +182,13 @@ getTextFileTopLines <- function(x, ...)
 #' @export
 getTextFileTopLines.character <- function(x, skip, header, n = 1000) {
   tmp <- readLines(x[1], n = skip + header + n)
-  tail(tmp, length(tmp) - skip - header)
+  utils::tail(tmp, length(tmp) - skip - header)
 }
 
 #' @export
 getTextFileTopLines.hdfsConn <- function(x, skip, header, n = 1000) {
   tmp <- rhread(x$loc, type = "text", max = skip + header + n)
-  tail(tmp, length(tmp) - skip - header)
+  utils::tail(tmp, length(tmp) - skip - header)
 }
 
 ############################################################################
@@ -266,7 +266,7 @@ readTable.hdfsConn <- function(file, rowsPerBlock, skip, header, hd, hdText, rea
     if(is.null(readTabParams$col.names))
       names(res) <- hd
     # id <- Sys.getenv("mapred.task.id")
-    id <- as.integer(Sys.time()) + runif(1) * 10000000
+    id <- as.integer(Sys.time()) + stats::runif(1) * 10000000
     collect(id, postTransFn(res))
   })
   control$mapred$rhipe_map_buff_size <- format(rowsPerBlock, scientific = FALSE)

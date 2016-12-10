@@ -13,3 +13,5 @@ protobuf_install/
 rhipe-java.log
 ^.*\.Rproj$
 ^\.Rproj\.user$
+cran-comments.md
+man-roxygen
