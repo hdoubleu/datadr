@@ -4,7 +4,7 @@
 \alias{divide}
 \title{Divide a Distributed Data Object}
 \usage{
-divide(data, by = NULL, spill = 1000000, filterFn = NULL, bsvFn = NULL,
+divide(data, by = NULL, spill = 1e+06, filterFn = NULL, bsvFn = NULL,
   output = NULL, overwrite = FALSE, preTransFn = NULL,
   postTransFn = NULL, params = NULL, packages = NULL, control = NULL,
   update = FALSE, verbose = TRUE)
@@ -82,7 +82,7 @@ Ryan Hafen
 }
 \references{
 \itemize{
- \item \url{http://tessera.io}
+ \item \url{http://deltarho.org}
  \item \href{http://onlinelibrary.wiley.com/doi/10.1002/sta4.7/full}{Guha, S., Hafen, R., Rounds, J., Xia, J., Li, J., Xi, B., & Cleveland, W. S. (2012). Large complex data: divide and recombine (D&R) with RHIPE. \emph{Stat}, 1(1), 53-67.}
 }
 }

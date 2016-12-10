@@ -11,7 +11,7 @@ protobuf_install/
 ^_ignore$
 \.sublime\-
 rhipe-java.log
-^.*\.Rproj$
-^\.Rproj\.user$
 cran-comments.md
 man-roxygen
+^.*\.Rproj$
+^\.Rproj\.user$
