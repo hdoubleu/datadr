@@ -197,8 +197,8 @@ mrExecInternal.kvLocalDiskList <- function(data, setup = NULL, map = NULL, reduc
         assign(pnames[i], params[[i]], envir = mapEnv)
 
       curDat <- lapply(fl$ff[idx], function(x) {
-        cat(sprintf(">> %s ; mapper %i ; Loading %s file\n",
-                    Sys.time(), mapper_id, file.path(fl$fp, x)))
+        # message(sprintf(">> %s ; mapper %i ; Loading %s file\n",
+        #             Sys.time(), mapper_id, file.path(fl$fp, x)))
         load(file.path(fl$fp, x))
         obj[[1]]
       })
